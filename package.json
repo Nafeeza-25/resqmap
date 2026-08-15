@@ -1,0 +1,17 @@
+{
+  "name": "resqmap",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "workspaces": ["frontend", "backend"],
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run serve",
+    "build": "npm --prefix frontend run build",
+    "build:frontend": "npm --prefix frontend run build",
+    "test": "node --test tests/domain/*.test.js tests/static/*.test.js backend/tests/*.test.js",
+    "test:ui": "npm --prefix frontend run test:ui",
+    "test:all": "npm run test && npm run test:ui"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "functions": {
+    "source": "backend",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log"
+    ],
+    "predeploy": [
+      "powershell -Command \"Copy-Item -Path shared -Destination backend\\shared -Recurse -Force\""
+    ],
+    "postdeploy": [
+      "powershell -Command \"Remove-Item -Path backend\\shared -Recurse -Force\""
+    ]
+  },
+  "hosting": {
+    "site": "resqmap",
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
