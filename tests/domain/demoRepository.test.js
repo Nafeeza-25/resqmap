@@ -48,3 +48,47 @@ test('CREATE decision creates a separate source-linked incident', async () => {
   assert.notEqual(created.id, 'INC-21');
   assert.equal(reports.find(r => r.id === 'M').incidentId, created.id);
 });
+
+test('Chennai demo journey preserves human verification, field evidence, approval, and reset', async () => {
+  const repo = createDemoRepository();
+
+  await repo.reviewReport({
+    reportId: 'G',
+    decision: 'LINK',
+    incidentId: 'INC-21',
+    operator: 'Demo Operator'
+  });
+  await repo.addEvidence({
+    incidentId: 'INC-21',
+    report: {
+      sourceId: 'Field Unit 3',
+      sourceType: 'field_unit',
+      verified: true,
+      timestamp: '2026-08-15T14:18:00+05:30',
+      text: 'Rescue has not been completed. Two elderly people remain on the rooftop near Gandhi Street.',
+      location: { lat: 12.9820, lng: 80.2182 }
+    }
+  });
+  await repo.recordDecision({
+    incidentId: 'INC-21',
+    action: 'APPROVE',
+    operator: 'Demo Operator',
+    note: 'Dispatch a rescue boat to Gandhi Street.'
+  });
+
+  const completed = await repo.getState();
+  const incident = completed.incidents.find(item => item.id === 'INC-21');
+  assert.equal(completed.reports.find(item => item.id === 'G').status, 'linked');
+  assert.equal(incident.intelligence.workflow.workflow, 'DISPATCH_FOR_APPROVAL');
+  assert.equal(incident.operatorDecision.action, 'APPROVE');
+  assert.deepEqual(completed.audit.slice(-3).map(event => event.type), [
+    'LINK_DECISION',
+    'FIELD_EVIDENCE_ADDED',
+    'WORKFLOW_DECISION'
+  ]);
+
+  const restarted = await repo.reset();
+  assert.equal(restarted.reports.find(item => item.id === 'G').status, 'review');
+  assert.equal(restarted.incidents.find(item => item.id === 'INC-21').operatorDecision, undefined);
+  assert.equal(restarted.audit.length, 5);
+});

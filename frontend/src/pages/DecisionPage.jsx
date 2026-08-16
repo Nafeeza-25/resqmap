@@ -1,258 +1,136 @@
-import { Link, useParams } from 'react-router-dom';
-import DecisionCard from '../components/DecisionCard.jsx';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import StatusPill from '../components/StatusPill.jsx';
+import PageHeader from '../components/PageHeader.jsx';
 import { useIncidents } from '../hooks/useRepositoryData.js';
 import { repository } from '../repository/index.js';
-
-function Icon({ name, className = 'h-5 w-5' }) {
-  const icons = {
-    shield: (
-      <>
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
-        <path d="m9 12 2 2 4-4" />
-      </>
-    ),
-    alert: (
-      <>
-        <path d="M12 3 2.7 19a2 2 0 0 0 1.73 3h15.14a2 2 0 0 0 1.73-3L12 3Z" />
-        <path d="M12 9v4M12 17h.01" />
-      </>
-    ),
-    user: (
-      <>
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21a8 8 0 0 1 16 0" />
-      </>
-    ),
-  };
-
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      {icons[name]}
-    </svg>
-  );
-}
-
-function IncidentNav({ incidentId }) {
-  return (
-    <nav className="mb-6 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
-      <div className="flex min-w-max gap-1">
-        <Link
-          to={`/incidents/${incidentId}`}
-          className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-        >
-          Incident & conflict
-        </Link>
-
-        <Link
-          to={`/incidents/${incidentId}/intelligence`}
-          className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-        >
-          Urgency & confidence
-        </Link>
-
-        <Link
-          to={`/incidents/${incidentId}/decision`}
-          className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-sm"
-        >
-          Decision & approval
-        </Link>
-      </div>
-    </nav>
-  );
-}
-
-function ContextCard({ label, children, tone = 'slate' }) {
-  const tones = {
-    slate: 'bg-slate-50 ring-slate-200',
-    red: 'bg-red-50 ring-red-100',
-    amber: 'bg-amber-50 ring-amber-100',
-    blue: 'bg-blue-50 ring-blue-100',
-  };
-
-  return (
-    <div
-      className={`rounded-xl p-4 ring-1 ring-inset ${tones[tone]}`}
-    >
-      <span className="text-[10px] font-bold uppercase tracking-[0.13em] text-slate-500">
-        {label}
-      </span>
-
-      <strong className="mt-2 block text-sm leading-5 text-slate-900">
-        {children}
-      </strong>
-    </div>
-  );
-}
+import { ArrowLeft, User } from 'lucide-react';
+import { useState } from 'react';
 
 export default function DecisionPage() {
   const { incidentId } = useParams();
   const { data: incidents } = useIncidents();
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState('');
 
   const incident = incidents.find(i => i.id === incidentId);
 
   if (!incident) {
     return (
-      <main className="min-h-screen bg-[#F5F7FA] p-6">
-        <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-          <strong className="text-lg text-slate-950">
-            Incident not found
-          </strong>
-        </div>
-      </main>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center p-4 text-center">
+        <h1 className="text-xl font-bold text-rq-text">Incident not found</h1>
+        <Link to="/" className="mt-6 rounded-xl bg-rq-text px-6 py-3 text-sm font-semibold text-rq-bg hover:bg-rq-text-secondary">Return to Command Center</Link>
+      </div>
     );
   }
 
-  const decide = (action, note) =>
-    repository.applyWorkflowDecision({
-      incidentId: incident.id,
-      action,
-      operator: 'Demo Operator',
-      note,
-    });
+  const recommendation = incident.intelligence?.workflow;
+
+  const decide = async (action) => {
+    setBusy(true);
+    try {
+      await repository.applyWorkflowDecision({
+        incidentId: incident.id,
+        action,
+        operator: 'Demo Operator',
+        note,
+      });
+      navigate(`/incidents/${incident.id}`);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
-    <main className="min-h-screen bg-[#F5F7FA]">
-      <div className="mx-auto max-w-[1450px] px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+    <div className="mx-auto max-w-[1200px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <Link to={`/incidents/${incident.id}`} className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-rq-text-secondary transition hover:text-rq-text">
+        <ArrowLeft className="h-4 w-4" /> Back to Incident Review
+      </Link>
 
-        {/* Header */}
-        <header className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-md bg-blue-50 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-blue-700 ring-1 ring-blue-100">
-                Stage B
-              </span>
+      <PageHeader 
+        title="Decision / Approval" 
+        subtitle={incident.title}
+        stage="decide"
+      />
 
-              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
-                Incident workflow recommendation
-              </span>
-            </div>
-
-            <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
-              Decision Card & Human Approval
-            </h1>
-
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
-              ResQMap recommends an auditable workflow action. It does not
-              autonomously dispatch responders or replace the responsible
-              human decision-maker.
-            </p>
-          </div>
-
-          <StatusPill
-            value={incident.intelligence?.workflow?.workflow}
-          />
-        </header>
-
-        <IncidentNav incidentId={incident.id} />
-
-        {/* Human authority banner */}
-        <section className="mb-6 rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-700 ring-1 ring-blue-200">
-              <Icon name="shield" className="h-[18px] w-[18px]" />
-            </div>
-
-            <div>
-              <p className="text-sm font-bold text-blue-950">
-                Human authority remains final
-              </p>
-
-              <p className="mt-1 text-xs leading-5 text-blue-800">
-                The recommendation, supporting evidence, operator decision,
-                and any override note remain traceable in the audit history.
-              </p>
-            </div>
-
-            <div className="sm:ml-auto">
-              <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-blue-800 ring-1 ring-blue-200">
-                <Icon name="user" className="h-3.5 w-3.5" />
-                Demo Operator
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* Context */}
-        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:p-6">
-          <div className="mb-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
-              Decision context
-            </p>
-
-            <h2 className="mt-1 text-lg font-bold text-slate-950">
-              Current incident picture
-            </h2>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <ContextCard label="Urgency" tone="red">
-              {incident.intelligence?.urgency?.level ?? '—'}
-            </ContextCard>
-
-            <ContextCard label="Evidence confidence" tone="amber">
-              {incident.intelligence?.confidence?.level ?? '—'}
-            </ContextCard>
-
-            <ContextCard label="Critical contradiction" tone="slate">
-              {incident.contradictions?.[0]?.label ?? 'None active'}
-            </ContextCard>
-
-            <ContextCard label="Top evidence gap" tone="blue">
-              {incident.intelligence?.evidenceGaps?.[0]?.label ?? 'Resolved'}
-            </ContextCard>
-          </div>
-        </section>
-
-        {/* Decision card */}
-        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 bg-slate-50 px-5 py-4 lg:px-6">
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-950 text-white">
-                <Icon name="shield" className="h-4 w-4" />
-              </div>
-
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">
-                  Operator action
-                </p>
-
-                <h2 className="mt-0.5 text-base font-bold text-slate-950">
-                  Review recommendation and record decision
-                </h2>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-5 lg:p-6">
-            <DecisionCard
-              incident={incident}
-              onDecision={decide}
-            />
-          </div>
-        </section>
-
-        {/* Footer safety */}
-        <footer className="mt-6 flex items-start gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-xs leading-5 text-slate-500">
-          <Icon
-            name="alert"
-            className="mt-0.5 h-4 w-4 shrink-0 text-slate-400"
-          />
-
-          Workflow recommendations are decision-support outputs. Operational
-          dispatch remains subject to authorized human approval and the
-          organization’s response procedures.
-        </footer>
+      <div className="mb-8 flex items-center gap-3 rounded-2xl border border-rq-info/20 bg-rq-info/10 p-6 text-rq-info shadow-sm">
+         <User className="h-6 w-6" />
+         <div>
+            <h2 className="text-sm font-bold">Human approval required</h2>
+            <p className="mt-1 text-xs">ResQMap recommends actions. It does not dispatch responders automatically.</p>
+         </div>
       </div>
-    </main>
+
+      <div className="grid gap-8 lg:grid-cols-2">
+         {/* Left Column: Context */}
+         <div className="flex flex-col gap-6">
+            <section className="rounded-2xl border border-rq-border bg-rq-surface p-6 shadow-sm">
+               <h3 className="text-[11px] font-bold uppercase tracking-wider text-rq-text-secondary">SITUATION</h3>
+               <div className="mt-4 grid grid-cols-2 gap-4">
+                  <div className="rounded-xl border border-rq-border bg-rq-surface-raised p-4">
+                     <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-rq-text-muted">URGENCY</p>
+                     <StatusPill value={incident.intelligence?.urgency?.level} />
+                  </div>
+                  <div className="rounded-xl border border-rq-border bg-rq-surface-raised p-4">
+                     <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-rq-text-muted">CONFIDENCE</p>
+                     <StatusPill value={incident.intelligence?.confidence?.level} />
+                  </div>
+               </div>
+               
+               {recommendation?.reasons?.length > 0 && (
+                 <div className="mt-6">
+                   <h3 className="text-[11px] font-bold uppercase tracking-wider text-rq-text-secondary">Recommendation Reasons</h3>
+                   <ul className="mt-3 space-y-2">
+                     {recommendation.reasons.map((r, idx) => (
+                       <li key={idx} className="flex items-start gap-2 text-sm text-rq-text-secondary">
+                         <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-rq-info" />
+                         {r}
+                       </li>
+                     ))}
+                   </ul>
+                 </div>
+               )}
+            </section>
+         </div>
+
+         {/* Right Column: Recommended Action & Approval */}
+         <div className="flex flex-col gap-6">
+            <section className="rounded-2xl border border-rq-border bg-rq-surface p-8 shadow-sm">
+               <div className="mb-6 rounded-xl border border-rq-border bg-rq-surface-raised p-6 text-center">
+                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-rq-info">RECOMMENDED ACTION</h3>
+                  <p className="mt-4 text-2xl font-bold uppercase text-rq-text">
+                     {recommendation?.workflow ? recommendation.workflow.replaceAll('_', ' ') : 'MONITOR'}
+                  </p>
+               </div>
+
+               <div className="flex flex-col gap-4">
+                 <textarea 
+                    placeholder="Optional operator note (required for override)..." 
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    className="w-full resize-none rounded-xl border border-rq-border bg-rq-surface-raised p-3 text-sm text-rq-text placeholder:text-rq-text-muted focus:border-rq-focus focus:outline-none focus:ring-1 focus:ring-rq-focus"
+                    rows={3}
+                 />
+                 
+                 <button
+                    onClick={() => decide('APPROVE_RECOMMENDATION')}
+                    disabled={busy}
+                    className="w-full rounded-xl bg-rq-red px-4 py-3 text-sm font-bold text-rq-bg shadow-sm transition hover:bg-rq-red/90 disabled:opacity-50"
+                 >
+                    Approve action
+                 </button>
+                 
+                 <button
+                    onClick={() => decide('REJECT')}
+                    disabled={busy || !note.trim()}
+                    className="w-full rounded-xl border border-rq-red/30 bg-transparent px-4 py-3 text-sm font-bold text-rq-red shadow-sm transition hover:bg-rq-red/10 disabled:opacity-50"
+                 >
+                    Reject / Override
+                 </button>
+               </div>
+            </section>
+         </div>
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import StatusPill from './StatusPill.jsx';
+import { Clock3, FileText, MapPin, Radio } from 'lucide-react';
 
 function displayTime(value) {
   if (!value) return 'Time unknown';
@@ -11,16 +12,17 @@ export default function ReportCard({ report, footer }) {
     <article className="report-card">
       <div className="report-card__meta">
         <div>
-          <strong>Report {report.id}</strong>
-          <span>{report.sourceId} · {report.channel ?? report.sourceType}</span>
+          <strong className="report-card__title"><FileText aria-hidden="true" size={15} /> Report {report.id}</strong>
+          <span className="report-card__source"><Radio aria-hidden="true" size={12} /> {report.sourceId} · {report.channel ?? report.sourceType}</span>
         </div>
         <div className="report-card__meta-right">
           <StatusPill value={report.status ?? 'review'} />
-          <span>{displayTime(report.timestamp)}</span>
+          <span className="report-card__time"><Clock3 aria-hidden="true" size={12} /> {displayTime(report.timestamp)}</span>
         </div>
       </div>
       <p className="report-card__text">“{report.text}”</p>
       <div className="report-card__tags">
+        {report.location && <span><MapPin aria-hidden="true" size={11} /> Location attached</span>}
         {report.language && <span>{report.language}</span>}
         {report.stale && <span>Possibly outdated</span>}
         {!report.location && <span>Location missing</span>}

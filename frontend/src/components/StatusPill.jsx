@@ -1,8 +1,18 @@
 const LABELS = {
-  LINK: 'LINK', CREATE: 'CREATE', HOLD: 'HOLD',
-  RAPID_VERIFY: 'RAPID VERIFY', DISPATCH_FOR_APPROVAL: 'DISPATCH FOR APPROVAL',
-  STANDARD_QUEUE: 'STANDARD QUEUE', MONITOR: 'MONITOR',
-  CRITICAL: 'CRITICAL', HIGH: 'HIGH', MEDIUM: 'MEDIUM', LOW: 'LOW',
+  CRITICAL: 'Critical',
+  HIGH: 'High',
+  MEDIUM: 'Medium',
+  LOW: 'Low',
+
+  RAPID_VERIFY: 'Needs verification',
+  DISPATCH_FOR_APPROVAL: 'Ready for approval',
+  STANDARD_QUEUE: 'Standard review',
+  MONITOR: 'Monitoring',
+
+  LINK: 'Link report',
+  CREATE: 'New incident',
+  HOLD: 'Needs review',
+
   linked: 'Linked', review: 'Review', hold: 'Hold', separate: 'Separate', active: 'Active'
 };
 

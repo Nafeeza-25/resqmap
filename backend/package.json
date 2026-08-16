@@ -4,8 +4,15 @@
   "version": "0.2.0",
   "type": "module",
   "main": "src/index.js",
+  "imports": {
+    "#shared/*": [
+      "./shared/*",
+      "../shared/*"
+    ]
+  },
   "scripts": {
-    "serve": "firebase emulators:start --only functions",
+    "serve": "node src/local.js",
+    "serve:firebase": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",

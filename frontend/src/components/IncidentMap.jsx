@@ -158,51 +158,51 @@ export default function IncidentMap({
                   <Popup className="resqmap-popup">
                     <div className="min-w-[230px] p-1">
                       <div className="flex items-center justify-between gap-3">
-                        <span className="font-mono text-[10px] font-bold text-blue-700">
+                        <span className="font-mono text-[10px] font-bold text-rq-info">
                           {incident.id}
                         </span>
 
                         <span
                           className={`rounded-md px-2 py-0.5 text-[9px] font-bold uppercase ${
                             urgency === 'CRITICAL'
-                              ? 'bg-red-50 text-red-700'
+                              ? 'bg-rq-red-soft text-rq-red'
                               : urgency === 'HIGH'
-                                ? 'bg-orange-50 text-orange-700'
+                                ? 'bg-rq-orange-soft text-rq-orange'
                                 : urgency === 'MEDIUM'
-                                  ? 'bg-amber-50 text-amber-700'
-                                  : 'bg-blue-50 text-blue-700'
+                                  ? 'bg-rq-warning-soft text-rq-warning'
+                                  : 'bg-rq-info/10 text-rq-info'
                           }`}
                         >
                           {urgency ?? 'Unknown'}
                         </span>
                       </div>
 
-                      <strong className="mt-2 block text-sm leading-5 text-slate-950">
+                      <strong className="mt-2 block text-sm leading-5 text-rq-text">
                         {incident.title}
                       </strong>
 
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 text-xs text-rq-text-secondary">
                         {incident.locationLabel}
                       </p>
 
-                      <div className="mt-3 space-y-2 border-t border-slate-100 pt-3">
+                      <div className="mt-3 space-y-2 border-t border-rq-border-soft pt-3">
                         <div className="flex justify-between gap-4 text-[11px]">
-                          <span className="text-slate-500">
+                          <span className="text-rq-text-secondary">
                             Evidence
                           </span>
 
-                          <strong className="text-slate-800">
+                          <strong className="text-rq-text">
                             {incident.intelligence?.confidence
                               ?.level ?? 'Unknown'}
                           </strong>
                         </div>
 
                         <div className="flex justify-between gap-4 text-[11px]">
-                          <span className="text-slate-500">
+                          <span className="text-rq-text-secondary">
                             Workflow
                           </span>
 
-                          <strong className="text-right text-slate-800">
+                          <strong className="text-right text-rq-text">
                             {(
                               incident.intelligence?.workflow
                                 ?.workflow ?? 'Unknown'
@@ -211,15 +211,15 @@ export default function IncidentMap({
                         </div>
 
                         <div className="flex justify-between gap-4 text-[11px]">
-                          <span className="text-slate-500">
+                          <span className="text-rq-text-secondary">
                             Conflicts
                           </span>
 
                           <strong
                             className={
                               contradictionCount > 0
-                                ? 'text-red-700'
-                                : 'text-slate-800'
+                                ? 'text-rq-red'
+                                : 'text-rq-text'
                             }
                           >
                             {contradictionCount}
@@ -229,7 +229,7 @@ export default function IncidentMap({
 
                       <Link
                         to={`/incidents/${incident.id}`}
-                        className="mt-3 flex items-center justify-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-bold text-white no-underline transition hover:bg-slate-800"
+                        className="mt-3 flex items-center justify-center rounded-lg bg-rq-surface-raised px-3 py-2 text-xs font-bold text-white no-underline transition hover:bg-rq-surface-hover"
                       >
                         Open incident intelligence
                       </Link>
@@ -260,19 +260,19 @@ export default function IncidentMap({
                 >
                   <Popup className="resqmap-popup">
                     <div className="min-w-[210px] p-1">
-                      <span className="text-[9px] font-bold uppercase tracking-[0.13em] text-slate-400">
+                      <span className="text-[9px] font-bold uppercase tracking-[0.13em] text-rq-text-muted">
                         Historical context
                       </span>
 
-                      <strong className="mt-1.5 block text-sm text-slate-900">
+                      <strong className="mt-1.5 block text-sm text-rq-text">
                         {item.name}
                       </strong>
 
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 text-xs text-rq-text-secondary">
                         {item.date}
                       </p>
 
-                      <div className="mt-3 rounded-lg bg-slate-50 p-2.5 text-[10px] leading-4 text-slate-500">
+                      <div className="mt-3 rounded-lg bg-rq-surface-raised p-2.5 text-[10px] leading-4 text-rq-text-secondary">
                         No casualty values are fabricated in this prototype.
                       </div>
                     </div>

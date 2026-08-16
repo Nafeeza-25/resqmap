@@ -1,23 +1,35 @@
+import { Activity, ClipboardCheck, Map, Radio, ScrollText, ShieldAlert } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 
-const nav = [
-  ['/', 'Overview'], ['/reports', 'Incoming Reports'], ['/review', 'LINK / CREATE / HOLD'], ['/map', 'Disaster Map'], ['/audit', 'Audit History']
+const navItems = [
+  { to: '/', label: 'Command center', icon: Activity, end: true },
+  { to: '/reports', label: 'Incoming reports', icon: Radio },
+  { to: '/review', label: 'Verify', icon: ClipboardCheck },
+  { to: '/map', label: 'Map', icon: Map },
+  { to: '/audit', label: 'History', icon: ScrollText },
 ];
 
 export default function AppShell() {
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <div className="brand"><div className="brand-mark">RQ</div><div><strong>ResQMap</strong><span>Decision Intelligence</span></div></div>
-        <nav aria-label="Primary navigation">
-          {nav.map(([to,label]) => <NavLink end={to === '/'} key={to} to={to} className={({isActive}) => isActive ? 'nav-link nav-link--active' : 'nav-link'}>{label}</NavLink>)}
+    <div className="ops-shell">
+      <aside className="ops-sidebar">
+        <div className="ops-brand">
+          <div className="ops-brand-mark"><ShieldAlert aria-hidden="true" size={19} /></div>
+          <div><strong>RESQMAP</strong><span>Response network</span></div>
+        </div>
+        <nav aria-label="Primary navigation" className="ops-nav">
+          {navItems.map(({ to, label, icon: Icon, end }) => (
+            <NavLink end={end} key={to} to={to} className={({ isActive }) => 'ops-nav-link' + (isActive ? ' ops-nav-link--active' : '')}>
+              <Icon aria-hidden="true" size={17} strokeWidth={1.9} /><span>{label}</span>
+            </NavLink>
+          ))}
         </nav>
-        <div className="sidebar-note"><span className="eyebrow">Architecture</span><strong>Separate API backend</strong><p>React stays presentation-only. Firebase Admin and Firestore access live on the server.</p></div>
+        <div className="ops-sidebar-footer">
+          <div className="ops-connection"><span aria-hidden="true" /> Operational</div>
+          <div className="ops-operator"><span>DO</span><div><strong>Demo operator</strong><small>Coordination desk</small></div></div>
+        </div>
       </aside>
-      <div className="app-main">
-        <header className="topbar"><div><span className="topbar-dot" /> Operations workspace <span className="topbar-context">/ Live response</span></div><div className="operator-chip"><span>DO</span> Demo Operator</div></header>
-        <main><Outlet /></main>
-      </div>
+      <main className="ops-main"><Outlet /></main>
     </div>
   );
 }

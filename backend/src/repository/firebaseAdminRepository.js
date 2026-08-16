@@ -1,7 +1,7 @@
-import { DEMO_REPORTS } from '../../shared/data/demoReports.js';
-import { extractClaims } from '../../shared/domain/claimExtractor.js';
-import { scoreReportAgainstIncident } from '../../shared/domain/incidentMatcher.js';
-import { buildSingleReportIncident, evaluateCanonicalIncident } from '../../shared/domain/buildIncidentIntelligence.js';
+import { DEMO_REPORTS } from '#shared/data/demoReports.js';
+import { extractClaims } from '#shared/domain/claimExtractor.js';
+import { scoreReportAgainstIncident } from '#shared/domain/incidentMatcher.js';
+import { buildSingleReportIncident, evaluateCanonicalIncident } from '#shared/domain/buildIncidentIntelligence.js';
 
 function toPlain(snapshot) {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
