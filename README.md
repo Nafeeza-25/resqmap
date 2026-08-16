@@ -96,12 +96,7 @@ POST /api/demo/reset                       — reset to initial demo state
 
 **Firebase mode** — connects to Firestore for persistent storage. Set these environment variables in `backend/.env`:
 
-```env
-RESQMAP_BACKEND_MODE=firebase
-FIREBASE_PROJECT_ID=your-project-id
-FIREBASE_CLIENT_EMAIL=your-service-account@project.iam.gserviceaccount.com
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-```
+
 
 ---
 
